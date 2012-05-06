@@ -1,0 +1,20 @@
+﻿@using SuggestionBox.Code
+@model IList<SuggestionBox.Models.CommentModel>
+
+@foreach (var m in Model)
+{
+    var deleteLinkClass = m.CanBeDeleted ? "on" : "off";
+	var undeleteLinkClass = m.CanBeUndeleted ? "on" : "off";
+    var deleteSpanClass = m.Status == CommentStatus.Deleted ? "on" : "off";
+    
+	<div class="row">
+		<div class="span12">
+			<div class="well">
+				<p>@Html.Raw(m.Body)</p>
+				<p>comment made on @m.Date</p>
+				<a id="deleteComment" href="#" class="@deleteLinkClass" onclick="SuggestionBox.Suggestions.deleteComment(@m.Id);">[Delete]</a>
+                <span class="@deleteSpanClass">Deleted - </span><a id="undeleteComment" href="#" class="@undeleteLinkClass" onclick="SuggestionBox.Suggestions.undeleteComment(@m.Id);">[Undelete]</a>
+			</div>
+		</div>
+	</div>
+}

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
+using SuggestionBox.Code.AutoMapper;
 
 namespace SuggestionBox
 {
@@ -24,7 +21,7 @@ namespace SuggestionBox
 			routes.MapRoute(
 				"Default", // Route name
 				"{controller}/{action}/{id}", // URL with parameters
-				new { controller = "Home", action = "Index", id = UrlParameter.Optional } // Parameter defaults
+				new { controller = "Suggestions", action = "Index", id = UrlParameter.Optional } // Parameter defaults
 			);
 
 		}
@@ -35,6 +32,8 @@ namespace SuggestionBox
 
 			RegisterGlobalFilters(GlobalFilters.Filters);
 			RegisterRoutes(RouteTable.Routes);
+
+			AutoMapperBootStrapper.Initialize();
 		}
 	}
 }

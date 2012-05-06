@@ -1,0 +1,43 @@
+﻿@model SuggestionBox.Models.SuggestionModel
+ 
+ @{
+	var approveLinkClass = @Model.CanBeApproved ? "on" : "off";
+	var completeLinkClass = @Model.CanBeCompleted ? "on" : "off";
+	var deleteLinkClass = @Model.CanBeDeleted ? "on" : "off";
+	var denyLinkClass = @Model.CanBeDenied ? "on" : "off";
+}
+           
+<div class="page-header">
+	<h1>@Model.Title</h1>
+</div>
+
+<p>@Html.Raw(Model.Body)</p>
+
+<p>Suggested on @Model.Date.ToShortDateString()</p>
+
+<hr/>
+
+<p><strong>@Model.Status</strong>
+	<a id="approve" href="#" class="@approveLinkClass">[Approve]</a>
+	<a id="complete" href="#" class="@completeLinkClass">[Complete]</a>
+	<a id="deny" href="#" class="@denyLinkClass">[Deny]</a>
+	<a id="delete" href="#" class="@deleteLinkClass">[Delete]</a>
+</p>
+
+<p>
+	@(Html.ActionLink("Go back to suggestion list", "Index")) or <a id="create" href="#">Comment on this suggestion</a>
+</p>
+<hr />
+
+<h2>Comments</h2>
+
+<div id="commentList">
+	@if (Model.Comments.Count > 0)
+	{
+        Html.RenderPartial("~/Views/Comments/Partials/_CommentList.cshtml", Model.Comments);
+    }
+ else
+ {
+		<p>No comments have been added to this suggestion yet.</p>
+	}
+</div>

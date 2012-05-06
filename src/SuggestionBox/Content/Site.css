@@ -322,3 +322,11 @@ div#title {
 .tri-state {
     width: 6em;
 }
+
+.on {
+    display: inline;
+}
+
+.off {
+    display: none;
+}

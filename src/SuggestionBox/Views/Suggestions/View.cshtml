@@ -1,0 +1,27 @@
+﻿@model SuggestionBox.Models.SuggestionModel
+
+@{
+    ViewBag.Title = @Model.Title;
+	var approveLinkClass = @Model.CanBeApproved ? "on" : "off";
+	var completeLinkClass = @Model.CanBeCompleted ? "on" : "off";
+	var deleteLinkClass = @Model.CanBeDeleted ? "on" : "off";
+	var denyLinkClass = @Model.CanBeDenied ? "on" : "off";
+}
+
+@section headContent
+{
+    <script src="@Url.Content("~/Scripts/SuggestionBox/Suggestions.js")" type="text/javascript"></script>
+	<script type="text/javascript">
+	    $(document).ready(function() {
+	        SuggestionBox.Suggestions.urlBase = '@Url.Content("~")';
+	        SuggestionBox.Suggestions.suggestionId = @Model.Id;
+	        SuggestionBox.Suggestions.setUpViewPage();
+	    });
+	</script>
+}
+
+<div id="msg"></div>
+
+<div id="suggestion">
+	@Html.Partial("Partials/_View", Model)
+</div>
