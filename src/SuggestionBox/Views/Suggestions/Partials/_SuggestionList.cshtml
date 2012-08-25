@@ -2,10 +2,9 @@
 
 @foreach(var m in Model)
 {
-	<div class="row">
-		<div class="span1">@(Html.ActionLink("View", "View", new { id = m.Id }))</div>
-		<div class="span11"><strong>@m.Title</strong> suggested on @m.Date.ToShortDateString() with <span class="badge">@m.Comments.Count</span> comments, <strong>@m.Status</strong></div>
-	</div>
+    <div class="row">
+        <div class="span12"><strong>@(Html.ActionLink(m.Title, "View", new { id = m.Id }))</strong> - <strong>@m.Status</strong><br />Suggested on @m.Date.ToShortDateString() with <span class="badge">@m.Comments.Count</span> comments, last comment made on @m.LastActivity</div>
+    </div>
     
     <hr/>
 }
