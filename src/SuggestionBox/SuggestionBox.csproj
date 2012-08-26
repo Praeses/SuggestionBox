@@ -40,6 +40,9 @@
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="MarkdownSharp">
+      <HintPath>..\packages\MarkdownSharp.1.13.0.0\lib\35\MarkdownSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Runtime.Serialization" />
@@ -72,6 +75,7 @@
     <Compile Include="Code\SuggestionEmailer.cs" />
     <Compile Include="Code\SuggestionStatus.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
+    <Compile Include="Controllers\MarkdownController.cs" />
     <Compile Include="Controllers\SuggestionsController.cs" />
     <Compile Include="Data\SuggestionBox.Designer.cs">
       <AutoGen>True</AutoGen>

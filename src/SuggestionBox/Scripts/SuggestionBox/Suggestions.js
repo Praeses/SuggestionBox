@@ -8,28 +8,54 @@
         + '</span>'
         + '<span style="display:block;">'
         + '<label style="width:110px">Description</label>'
-        + '<textarea id="SuggestionDescription" cols="35" rows="10" style="margin:0px; width:100%"/></span></div>';
+        + '<textarea id="SuggestionDescription" cols="35" rows="10" style="margin:0px; width:100%"/></span>'
+        + '<br /><div id="preview"></div>'
+        + '</div>';
     Suggestions.commentDialog = '<div id="dialog" title="Create Comment">'
         + '<span style="display:block;">'
         + '<label style="width:110px">Comment</label>'
-        + '<textarea id="Comment" cols="35" rows="14" style="margin:0px; width:100%"/></span></div>';
+        + '<textarea id="Comment" cols="35" rows="14" style="margin:0px; width:100%"/></span>'
+        + '<br /><div id="preview"></div>'
+        + '</div>';
     Suggestions.approveDialog = '<div id="dialog" title="Approve Suggestion">'
         + '<span style="display:block;">'
         + '<label style="width:250px">Approval Comment</label>'
-        + '<textarea id="Comment" cols="35" rows="14" style="margin:0px; width:100%"/></span></div>';
+        + '<textarea id="Comment" cols="35" rows="14" style="margin:0px; width:100%"/></span>'
+        + '<br /><div id="preview"></div>'
+        + '</div>';
     Suggestions.completeDialog = '<div id="dialog" title="Complete Suggestion">'
         + '<span style="display:block;">'
         + '<label style="width:250px">Completion Comment</label>'
-        + '<textarea id="Comment" cols="35" rows="14" style="margin:0px; width:100%"/></span></div>';
+        + '<textarea id="Comment" cols="35" rows="14" style="margin:0px; width:100%"/></span>'
+        + '<br /><div id="preview"></div>'
+        + '</div>';
     Suggestions.denyDialog = '<div id="dialog" title="Deny Suggestion">'
         + '<span style="display:block;">'
         + '<label style="width:250px">Denial Comment</label>'
-        + '<textarea id="Comment" cols="35" rows="14" style="margin:0px; width:100%"/></span></div>';
+        + '<textarea id="Comment" cols="35" rows="14" style="margin:0px; width:100%"/></span>'
+        + '<br /><div id="preview"></div>'
+        + '</div>';
     Suggestions.deleteDialog = '<div id="dialog" title="Delete Suggestion">'
         + '<span style="display:block;">'
         + '<label style="width:250px">Deletion Comment</label>'
-        + '<textarea id="Comment" cols="35" rows="14" style="margin:0px; width:100%"/></span></div>';
+        + '<textarea id="Comment" cols="35" rows="14" style="margin:0px; width:100%"/></span>'
+        + '<br /><div id="preview"></div>'
+        + '</div>';
     Suggestions.suggestionId = 0;
+
+    var previewMarkdown = function(dialog, text) {
+        var model = { text: text.val() };
+        $.ajax({
+            url: Suggestions.urlBase + 'Markdown/Transform',
+            data: model,
+            type: 'POST',
+            success: function(data) {
+                $('#preview').html(data);
+            }
+        });
+
+        dialog.dialog({ height: 600 });
+    };
 
     Suggestions.deleteComment = function(commentId) {
         if (confirm('Are you sure you want to delete this comment?')) {
@@ -62,26 +88,36 @@
                 modal: true,
                 resizable: true,
                 open: function() { $(this).find("#SuggestionTitle").focus(); },
-                buttons: [{
-                    text: "Submit",
-                    click: function() {
-                        var model = { Title: $(this).find("#SuggestionTitle").val(), Body: $(this).find("#SuggestionDescription").val() };
+                close: function() { $('#dialog').remove(); },
+                buttons: [
+                    {
+                        text: "Preview",
+                        click: function () {
+                            previewMarkdown($(this), $(this).find("#SuggestionDescription"));
+                        }
+                    },
+                    {
+                        text: "Submit",
+                        click: function() {
+                            var model = { Title: $(this).find("#SuggestionTitle").val(), Body: $(this).find("#SuggestionDescription").val() };
+                            
+                            $.blockUI();
 
-                        $.blockUI();
+                            $.ajax({
+                                url: Suggestions.urlBase + 'Suggestions/Add',
+                                data: model,
+                                type: 'POST',
+                                success: function(data) {
+                                    $('#suggestionList').html(data);
+                                    $.unblockUI();
+                                }
+                            });
 
-                        $.ajax({
-                            url: Suggestions.urlBase + 'Suggestions/Add',
-                            data: model,
-                            type: 'POST',
-                            success: function(data) {
-                                $('#suggestionList').html(data);
-                                $.unblockUI();
-                            }
-                        });
-
-                        $(this).dialog('destroy');
+                            $(this).dialog('destroy');
+                            $('#dialog').remove();
+                        }
                     }
-                }]
+                ]
             });
         });
     };
@@ -93,6 +129,10 @@
             $.unblockUI();
         });
 
+        $(document).on('click', '#preview', null, function() {
+            alert('preview');
+        });
+
         $(document).on('click', '#create', null, function() {
             $(Suggestions.commentDialog).dialog({
                 autoOpen: true,
@@ -101,7 +141,15 @@
                 modal: true,
                 resizable: true,
                 open: function() { $(this).find("#Comment").focus(); },
-                buttons: [{
+                close: function() { $('#dialog').remove(); },
+                buttons: [
+                    {
+                        text: "Preview",
+                        click: function () {
+                            previewMarkdown($(this), $(this).find("#Comment"));
+                        }
+                    },
+                    {
                     text: "Submit",
                     click: function() {
                         var model = { Body: $(this).find("#Comment").val(), SuggestionId: SuggestionBox.Suggestions.suggestionId };
@@ -117,6 +165,7 @@
                         });
 
                         $(this).dialog('destroy');
+                        $('#dialog').remove();
                     }
                 }]
             });
@@ -130,7 +179,15 @@
                 modal: true,
                 resizable: true,
                 open: function() { $(this).find("#Comment").focus(); },
-                buttons: [{
+                close: function() { $('#dialog').remove(); },
+                buttons: [
+                    {
+                        text: "Preview",
+                        click: function () {
+                            previewMarkdown($(this), $(this).find("#Comment"));
+                        }
+                    },
+                    {
                     text: "Submit",
                     click: function() {
                         var model = { commentText: $(this).find("#Comment").val(), Id: SuggestionBox.Suggestions.suggestionId };
@@ -146,6 +203,7 @@
                         });
 
                         $(this).dialog('destroy');
+                        $('#dialog').remove();
                     }
                 }]
             });
@@ -159,7 +217,15 @@
                 modal: true,
                 resizable: true,
                 open: function() { $(this).find("#Comment").focus(); },
-                buttons: [{
+                close: function() { $('#dialog').remove(); },
+                buttons: [
+                    {
+                        text: "Preview",
+                        click: function () {
+                            previewMarkdown($(this), $(this).find("#Comment"));
+                        }
+                    },
+                    {
                     text: "Submit",
                     click: function() {
                         var model = { commentText: $(this).find("#Comment").val(), Id: SuggestionBox.Suggestions.suggestionId };
@@ -175,6 +241,7 @@
                         });
 
                         $(this).dialog('destroy');
+                        $('#dialog').remove();
                     }
                 }]
             });
@@ -188,7 +255,15 @@
                 modal: true,
                 resizable: true,
                 open: function() { $(this).find("#Comment").focus(); },
-                buttons: [{
+                close: function() { $('#dialog').remove(); },
+                buttons: [
+                    {
+                        text: "Preview",
+                        click: function () {
+                            previewMarkdown($(this), $(this).find("#Comment"));
+                        }
+                    },
+                    {
                     text: "Submit",
                     click: function() {
                         var model = { commentText: $(this).find("#Comment").val(), Id: SuggestionBox.Suggestions.suggestionId };
@@ -204,6 +279,7 @@
                         });
 
                         $(this).dialog('destroy');
+                        $('#dialog').remove();
                     }
                 }]
             });
@@ -217,7 +293,15 @@
                 modal: true,
                 resizable: true,
                 open: function() { $(this).find("#Comment").focus(); },
-                buttons: [{
+                close: function() { $('#dialog').remove(); },
+                buttons: [
+                    {
+                        text: "Preview",
+                        click: function () {
+                            previewMarkdown($(this), $(this).find("#Comment"));
+                        }
+                    },
+                    {
                     text: "Submit",
                     click: function() {
                         var model = { commentText: $(this).find("#Comment").val(), Id: Suggestions.suggestionId };
@@ -233,6 +317,7 @@
                         });
 
                         $(this).dialog('destroy');
+                        $('#dialog').remove();
                     }
                 }]
             });

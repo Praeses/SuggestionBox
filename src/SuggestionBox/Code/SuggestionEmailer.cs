@@ -1,35 +1,36 @@
 ﻿using System.Net.Mail;
 using System.Web.Configuration;
+using MarkdownSharp;
 using SuggestionBox.Data;
 
 namespace SuggestionBox.Code
 {
-	public static class SuggestionEmailer
-	{
-		public static void SendEmail(Suggestion suggestion)
-		{
-			var appName = WebConfigurationManager.AppSettings["AppName"];
-			var appUrl = WebConfigurationManager.AppSettings["AppUrl"];
-			var smtpServer = WebConfigurationManager.AppSettings["SmtpServer"];
-			var fromAddress = WebConfigurationManager.AppSettings["EmailFrom"];
-			var toAddress = WebConfigurationManager.AppSettings["EmailTo"];
+    public static class SuggestionEmailer
+    {
+        public static void SendEmail(Suggestion suggestion)
+        {
+            var markdown = new Markdown();
+            var appName = WebConfigurationManager.AppSettings["AppName"];
+            var appUrl = WebConfigurationManager.AppSettings["AppUrl"];
+            var smtpServer = WebConfigurationManager.AppSettings["SmtpServer"];
+            var fromAddress = WebConfigurationManager.AppSettings["EmailFrom"];
+            var toAddress = WebConfigurationManager.AppSettings["EmailTo"];
 
-			var subject = string.Format("{0}: {1}", appName, suggestion.Title);
-			var body = string.Format(@"""{0}""  has been submitted to {1}.
+            var subject = string.Format("{0}: {1}", appName, suggestion.Title);
+            var body = string.Format(@"<p>""{0}""  has been submitted to {1}.</p>
+{2}
+<p>You can view the suggestion <a href=""{3}Suggestions/View/{4}"">here</a>.</p>", suggestion.Title, appName, markdown.Transform(suggestion.Body), appUrl, suggestion.Id);
 
-""{2}""
+            var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            };
 
-You can view the suggestion here: {3}Suggestions/View/{4}", suggestion.Title, appName, suggestion.Body, appUrl, suggestion.Id);
+            var client = new SmtpClient(smtpServer);
 
-			var message = new MailMessage(fromAddress, toAddress)
-			{
-				Subject = subject,
-				Body = body
-			};
-
-			var client = new SmtpClient(smtpServer);
-
-			client.Send(message);
-		}
-	}
+            client.Send(message);
+        }
+    }
 }
